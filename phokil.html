@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LMS Photo Kilat - Member Area Premium</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] },
+                    colors: {
+                        brand: { 50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb', 900: '#1e3a8a' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
+        
+        body {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        
+        /* Memastikan teks link panjang patah ke bawah / tidak overflow */
+        .break-link {
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 antialiased min-h-screen flex flex-col">
+
+    <!-- ==================== LOGIN SCREEN ==================== -->
+    <div id="login-screen" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-brand-900 to-brand-600 px-4">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md relative overflow-hidden">
+            <div class="absolute -top-16 -right-16 w-32 h-32 bg-brand-100 rounded-full opacity-50"></div>
+            
+            <div class="text-center mb-8 relative z-10">
+                <div class="inline-block bg-brand-100 p-4 rounded-full mb-4 shadow-sm border border-brand-200">
+                    <i class="fa-solid fa-camera-retro text-4xl text-brand-600"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-800">Login Photo Kilat</h2>
+                <p class="text-sm text-gray-500 mt-2 leading-relaxed">Terima kasih sudah membeli akses tools ini<br>masukkan hak akses pembelian anda disini.</p>
+            </div>
+
+            <form id="login-form" class="space-y-5 relative z-10">
+                <div id="error-msg" class="hidden bg-red-100 border-l-4 border-red-500 text-red-700 p-3 text-sm rounded shadow-sm">
+                    <i class="fa-solid fa-triangle-exclamation mr-1"></i> Username atau Password salah!
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fa-solid fa-user text-gray-400"></i>
+                        </div>
+                        <input type="text" id="username" class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500" placeholder="Masukkan username" required>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fa-solid fa-lock text-gray-400"></i>
+                        </div>
+                        <input type="password" id="password" class="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500" placeholder="••••••••" required>
+                        <!-- Tombol Mata untuk Tampilkan Password -->
+                        <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-brand-600 transition">
+                            <i class="fa-solid fa-eye" id="eyeIcon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold py-3 rounded-lg shadow-md transition duration-300 transform hover:-translate-y-0.5">
+                    Masuk Member Area <i class="fa-solid fa-arrow-right ml-2"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- ==================== DASHBOARD SCREEN ==================== -->
+    <div id="dashboard-screen" class="hidden flex-col min-h-screen w-full">
+        
+        <!-- Navbar -->
+        <nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16">
+                    <div class="flex items-center">
+                        <i class="fa-solid fa-camera text-yellow-500 text-2xl mr-2"></i>
+                        <span class="font-bold text-xl text-gray-800 tracking-tight">Photo<span class="text-brand-600">Kilat</span></span>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <span class="text-sm font-medium text-gray-600 hidden md:block">Halo, Member!</span>
+                        <button onclick="logout()" class="text-red-500 hover:text-red-700 hover:bg-red-50 px-3 py-2 rounded-md text-sm font-medium transition">
+                            <i class="fa-solid fa-arrow-right-from-bracket mr-1"></i> Keluar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full fade-in">
+            
+            <!-- Hero Section -->
+            <div class="bg-brand-900 rounded-2xl p-8 mb-8 text-white shadow-xl relative overflow-hidden">
+                <div class="relative z-10">
+                    <h1 class="text-3xl md:text-4xl font-bold mb-3">Assalamu’alaikum warahmatullahi wabarakatuh</h1>
+                    <p class="text-lg text-brand-100 max-w-3xl leading-relaxed mb-4">
+                        Selamat bergabung di grup Akses Member Area <strong>"Photo Kilat"</strong> 📸 <br>
+                        Terima kasih sudah membeli tools ini. Semoga bermanfaat dan membantu banyak UMKM meningkatkan kualitas foto produknya 🤲
+                    </p>
+                </div>
+            </div>
+
+            <!-- Rules & Disclaimer -->
+            <div class="bg-red-50 border border-red-200 rounded-xl p-6 mb-10 shadow-sm flex flex-col md:flex-row items-start md:items-center gap-4">
+                <div class="bg-red-100 p-3 rounded-full text-red-600 shrink-0">
+                    <i class="fa-solid fa-triangle-exclamation text-2xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-red-800 mb-1">⚠️ CATATAN PENTING</h3>
+                    <ul class="list-disc list-inside text-red-700 text-sm md:text-base leading-relaxed">
+                        <li>Link bersifat <strong>pribadi</strong> — hanya untuk penggunaan pribadi.</li>
+                        <li>🚫 <strong>Dilarang</strong> menyebarkan atau menjual kembali link ini.</li>
+                        <li>❌ Tools yang disebarkan atau dijual ulang <strong>tidak halal dan tidak berkah</strong>.</li>
+                        <li>❌ Daftar affiliate gratis hubungi 085755643820 agustriian</strong>.</li>
+
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Content Grid Layout -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                <!-- KOLOM KIRI: MATERI & REKAMAN VIDEO -->
+                <div class="lg:col-span-2 space-y-10">
+                    
+                    <!-- VIDEO TUTORIAL UTAMA -->
+                    <section>
+                        <div class="flex items-center mb-6">
+                            <div class="bg-green-100 p-2 rounded-lg text-green-600 mr-3"><i class="fa-solid fa-play-circle text-xl"></i></div>
+                            <h2 class="text-2xl font-bold text-gray-800">Video Tutorial Penggunaan Tools</h2>
+                        </div>
+                        
+                        <a href="https://youtu.be/DJ-zaSS7hX8" target="_blank" class="block bg-white rounded-xl shadow-md hover:shadow-lg border border-gray-200 overflow-hidden transition-all duration-300 group">
+                            <div class="w-full aspect-video md:h-[350px] relative bg-gray-100">
+                                <img src="https://img.youtube.com/vi/DJ-zaSS7hX8/maxresdefault.jpg" onerror="this.src='https://img.youtube.com/vi/DJ-zaSS7hX8/hqdefault.jpg';" alt="Thumbnail Tutorial Utama" class="w-full h-full object-cover">
+                                <div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-20 group-hover:bg-opacity-40 transition-all duration-300">
+                                    <i class="fa-brands fa-youtube text-7xl text-red-600 drop-shadow-lg group-hover:scale-110 transition-transform duration-300"></i>
+                                </div>
+                            </div>
+                            <div class="p-6 border-l-4 border-green-500">
+                                <h4 class="font-bold text-gray-800 text-xl group-hover:text-green-600 transition mb-1">PANDUAN LENGKAP PHOTO KILAT</h4>
+                                <p class="text-sm text-gray-500">Tonton video ini terlebih dahulu sebelum mulai menggunakan tools.</p>
+                            </div>
+                        </a>
+                    </section>
+
+                    <!-- REKAMAN KELAS ZOOM -->
+                    <section>
+                        <div class="flex items-center mb-6">
+                            <div class="bg-brand-100 p-2 rounded-lg text-brand-600 mr-3"><i class="fa-solid fa-video"></i></div>
+                            <h2 class="text-2xl font-bold text-gray-800">Record YouTube (Webinar/Zoom)</h2>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <!-- Record 1 -->
+                            <a href="https://www.youtube.com/watch?v=2W-riqS6ZQ8" target="_blank" class="block bg-white rounded-xl shadow-sm hover:shadow-lg border border-gray-100 overflow-hidden transition-all duration-300 group">
+                                <div class="w-full aspect-video relative bg-gray-100">
+                                    <img src="https://img.youtube.com/vi/2W-riqS6ZQ8/hqdefault.jpg" alt="Thumbnail Record 1" class="w-full h-full object-cover">
+                                    <div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-20 group-hover:bg-opacity-40 transition-all duration-300">
+                                        <i class="fa-brands fa-youtube text-6xl text-red-600 drop-shadow-md group-hover:scale-110 transition-transform duration-300"></i>
+                                    </div>
+                                </div>
+                                <div class="p-4">
+                                    <h4 class="font-bold text-gray-800 group-hover:text-brand-600 transition">RECORD 1</h4>
+                                </div>
+                            </a>
+
+                            <!-- Record 2 -->
+                            <a href="https://www.youtube.com/live/KnKV2MufPqg?si=Sc4yhvyux8VRCoq8" target="_blank" class="block bg-white rounded-xl shadow-sm hover:shadow-lg border border-gray-100 overflow-hidden transition-all duration-300 group">
+                                <div class="w-full aspect-video relative bg-gray-100">
+                                    <img src="https://img.youtube.com/vi/KnKV2MufPqg/hqdefault.jpg" alt="Thumbnail Record 2" class="w-full h-full object-cover">
+                                    <div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-20 group-hover:bg-opacity-40 transition-all duration-300">
+                                        <i class="fa-brands fa-youtube text-6xl text-red-600 drop-shadow-md group-hover:scale-110 transition-transform duration-300"></i>
+                                    </div>
+                                </div>
+                                <div class="p-4">
+                                    <h4 class="font-bold text-gray-800 group-hover:text-brand-600 transition">RECORD 2</h4>
+                                </div>
+                            </a>
+
+                            <!-- Record 3 -->
+                            <a href="https://www.youtube.com/live/D7dBMV4B7uo?si=verYKD4rNJV2UmC5" target="_blank" class="block bg-white rounded-xl shadow-sm hover:shadow-lg border border-gray-100 overflow-hidden transition-all duration-300 group">
+                                <div class="w-full aspect-video relative bg-gray-100">
+                                    <img src="https://img.youtube.com/vi/D7dBMV4B7uo/hqdefault.jpg" alt="Thumbnail Record 3" class="w-full h-full object-cover">
+                                    <div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-20 group-hover:bg-opacity-40 transition-all duration-300">
+                                        <i class="fa-brands fa-youtube text-6xl text-red-600 drop-shadow-md group-hover:scale-110 transition-transform duration-300"></i>
+                                    </div>
+                                </div>
+                                <div class="p-4">
+                                    <h4 class="font-bold text-gray-800 group-hover:text-brand-600 transition">RECORD 3</h4>
+                                </div>
+                            </a>
+
+                            <!-- Record 4 -->
+                            <a href="https://www.youtube.com/live/yTlu0L5Y4Q0?si=hecQT51W3zmEX6s2" target="_blank" class="block bg-white rounded-xl shadow-sm hover:shadow-lg border border-gray-100 overflow-hidden transition-all duration-300 group">
+                                <div class="w-full aspect-video relative bg-gray-100">
+                                    <img src="https://img.youtube.com/vi/yTlu0L5Y4Q0/hqdefault.jpg" alt="Thumbnail Record 4" class="w-full h-full object-cover">
+                                    <div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-20 group-hover:bg-opacity-40 transition-all duration-300">
+                                        <i class="fa-brands fa-youtube text-6xl text-red-600 drop-shadow-md group-hover:scale-110 transition-transform duration-300"></i>
+                                    </div>
+                                </div>
+                                <div class="p-4">
+                                    <h4 class="font-bold text-gray-800 group-hover:text-brand-600 transition">RECORD 4</h4>
+                                </div>
+                            </a>
+
+                            <!-- Record 5 -->
+                            <a href="https://www.youtube.com/live/kZ-RLVQR828?si=1PLTQrxq-laVh1lJ" target="_blank" class="block bg-white rounded-xl shadow-sm hover:shadow-lg border border-gray-100 overflow-hidden transition-all duration-300 group">
+                                <div class="w-full aspect-video relative bg-gray-100">
+                                    <img src="https://img.youtube.com/vi/kZ-RLVQR828/hqdefault.jpg" alt="Thumbnail Record 5" class="w-full h-full object-cover">
+                                    <div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-20 group-hover:bg-opacity-40 transition-all duration-300">
+                                        <i class="fa-brands fa-youtube text-6xl text-red-600 drop-shadow-md group-hover:scale-110 transition-transform duration-300"></i>
+                                    </div>
+                                </div>
+                                <div class="p-4">
+                                    <h4 class="font-bold text-gray-800 group-hover:text-brand-600 transition">RECORD 5</h4>
+                                </div>
+                            </a>
+
+                            <!-- Record 6 -->
+                            <a href="https://www.youtube.com/live/h7FYvMsbpTw?si=RP6EKs7od3r4rasP" target="_blank" class="block bg-white rounded-xl shadow-sm hover:shadow-lg border border-gray-100 overflow-hidden transition-all duration-300 group">
+                                <div class="w-full aspect-video relative bg-gray-100">
+                                    <img src="https://img.youtube.com/vi/h7FYvMsbpTw/hqdefault.jpg" alt="Thumbnail Record 6" class="w-full h-full object-cover">
+                                    <div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-20 group-hover:bg-opacity-40 transition-all duration-300">
+                                        <i class="fa-brands fa-youtube text-6xl text-red-600 drop-shadow-md group-hover:scale-110 transition-transform duration-300"></i>
+                                    </div>
+                                </div>
+                                <div class="p-4">
+                                    <h4 class="font-bold text-gray-800 group-hover:text-brand-600 transition">RECORD 6</h4>
+                                </div>
+                            </a>
+                        </div>
+                    </section>
+
+                    <!-- BONUS KELAS: TUTORIAL VIDEO AI -->
+                    <section>
+                        <div class="flex items-center mb-6 mt-4">
+                            <div class="bg-purple-100 p-2 rounded-lg text-purple-600 mr-3"><i class="fa-solid fa-clapperboard"></i></div>
+                            <h2 class="text-2xl font-bold text-gray-800">Tutorial AI Editing & Omni Flow</h2>
+                        </div>
+                        
+                        <!-- AI Iklan Omni (Featured YouTube Card) -->
+                        <div class="mb-6">
+                            <a href="https://youtu.be/l2XKeotiMzk" target="_blank" class="block bg-white rounded-xl shadow-sm hover:shadow-lg border border-gray-100 overflow-hidden transition-all duration-300 group">
+                                <div class="w-full aspect-video md:h-[350px] relative bg-gray-100">
+                                    <img src="https://img.youtube.com/vi/l2XKeotiMzk/maxresdefault.jpg" onerror="this.src='https://img.youtube.com/vi/l2XKeotiMzk/hqdefault.jpg';" alt="Thumbnail AI Iklan" class="w-full h-full object-cover">
+                                    <div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-20 group-hover:bg-opacity-40 transition-all duration-300">
+                                        <i class="fa-brands fa-youtube text-7xl text-red-600 drop-shadow-lg group-hover:scale-110 transition-transform duration-300"></i>
+                                    </div>
+                                </div>
+                                <div class="p-6 border-l-4 border-green-500">
+                                    <div class="inline-block bg-green-100 text-green-800 text-xs px-2.5 py-1 rounded font-bold mb-2">KHUSUS MEMBER KILAT ✅</div>
+                                    <h4 class="font-bold text-gray-800 text-xl group-hover:text-green-600 transition mb-1">Tutorial Video AI Iklan (Promkil + Flow Omni)</h4>
+                                    <p class="text-sm text-gray-500">Langkah teknis mengoptimalkan iklan video pakai AI Prompt.</p>
+                                </div>
+                            </a>
+                        </div>
+
+                        <!-- Link Aplikasi Biasa -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                            <a href="https://labs.google/fx/tools/flow" target="_blank" class="bg-white p-5 rounded-xl shadow-sm hover:shadow-md border border-gray-100 transition group flex items-start gap-3">
+                                <div class="text-brand-500 text-xl"><i class="fa-brands fa-google"></i></div>
+                                <div>
+                                    <h4 class="font-bold text-gray-800 text-sm group-hover:text-brand-600 transition">Akses Flow Google Labs</h4>
+                                    <p class="text-xs text-gray-500 mt-1">Buka web labs.google/fx untuk akses tools Omni secara gratis.</p>
+                                </div>
+                            </a>
+                            <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.labs.whisk" target="_blank" class="bg-white p-5 rounded-xl shadow-sm hover:shadow-md border border-gray-100 transition group flex items-start gap-3">
+                                <div class="text-brand-500 text-xl"><i class="fa-brands fa-google-play"></i></div>
+                                <div>
+                                    <h4 class="font-bold text-gray-800 text-sm group-hover:text-brand-600 transition">Aplikasi Flow (Android)</h4>
+                                    <p class="text-xs text-gray-500 mt-1">Download aplikasi labs langsung dari Google Playstore.</p>
+                                </div>
+                            </a>
+                        </div>
+
+                        <!-- Kumpulan Tutorial YouTube (Grid Cards) -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <a href="https://youtu.be/WwyapjyWQSQ" target="_blank" class="block bg-white rounded-xl shadow-sm hover:shadow-lg border border-gray-100 overflow-hidden transition-all duration-300 group">
+                                <div class="w-full aspect-video relative bg-gray-100">
+                                    <img src="https://img.youtube.com/vi/WwyapjyWQSQ/hqdefault.jpg" alt="Thumbnail Gerakin Gambar" class="w-full h-full object-cover">
+                                    <div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-20 group-hover:bg-opacity-40 transition-all duration-300">
+                                        <i class="fa-brands fa-youtube text-5xl text-red-600 drop-shadow-md group-hover:scale-110 transition-transform duration-300"></i>
+                                    </div>
+                                </div>
+                                <div class="p-4">
+                                    <h4 class="font-bold text-gray-800 text-sm group-hover:text-red-600 transition">Tutorial Gerakin Gambar ke Video</h4>
+                                </div>
+                            </a>
+
+                            <a href="https://youtu.be/c69ts2VCm_E" target="_blank" class="block bg-white rounded-xl shadow-sm hover:shadow-lg border border-gray-100 overflow-hidden transition-all duration-300 group">
+                                <div class="w-full aspect-video relative bg-gray-100">
+                                    <img src="https://img.youtube.com/vi/c69ts2VCm_E/hqdefault.jpg" alt="Thumbnail Storyboard" class="w-full h-full object-cover">
+                                    <div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-20 group-hover:bg-opacity-40 transition-all duration-300">
+                                        <i class="fa-brands fa-youtube text-5xl text-red-600 drop-shadow-md group-hover:scale-110 transition-transform duration-300"></i>
+                                    </div>
+                                </div>
+                                <div class="p-4">
+                                    <h4 class="font-bold text-gray-800 text-sm group-hover:text-red-600 transition">Tutorial Buat Video Storyboard</h4>
+                                </div>
+                            </a>
+
+                            <a href="https://youtube.com/live/ftFRpOgNcwQ?feature=share" target="_blank" class="block bg-white rounded-xl shadow-sm hover:shadow-lg border border-gray-100 overflow-hidden transition-all duration-300 group">
+                                <div class="w-full aspect-video relative bg-gray-100">
+                                    <img src="https://img.youtube.com/vi/ftFRpOgNcwQ/hqdefault.jpg" alt="Thumbnail Voiceover" class="w-full h-full object-cover">
+                                    <div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-20 group-hover:bg-opacity-40 transition-all duration-300">
+                                        <i class="fa-brands fa-youtube text-5xl text-red-600 drop-shadow-md group-hover:scale-110 transition-transform duration-300"></i>
+                                    </div>
+                                </div>
+                                <div class="p-4">
+                                    <h4 class="font-bold text-gray-800 text-sm group-hover:text-red-600 transition">Tutorial Buat Voiceover (VO)</h4>
+                                </div>
+                            </a>
+
+                            <a href="https://youtube.com/live/yi_mf7TPEfk?feature=share" target="_blank" class="block bg-white rounded-xl shadow-sm hover:shadow-lg border border-gray-100 overflow-hidden transition-all duration-300 group">
+                                <div class="w-full aspect-video relative bg-gray-100">
+                                    <img src="https://img.youtube.com/vi/yi_mf7TPEfk/hqdefault.jpg" alt="Thumbnail Capcut" class="w-full h-full object-cover">
+                                    <div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-20 group-hover:bg-opacity-40 transition-all duration-300">
+                                        <i class="fa-brands fa-youtube text-5xl text-red-600 drop-shadow-md group-hover:scale-110 transition-transform duration-300"></i>
+                                    </div>
+                                </div>
+                                <div class="p-4">
+                                    <h4 class="font-bold text-gray-800 text-sm group-hover:text-red-600 transition">Gabungin Video & VO di Capcut</h4>
+                                </div>
+                            </a>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- KOLOM KANAN: PANDUAN, TOOLS & PROFILE -->
+                <div class="space-y-8">
+                    
+                    <!-- CARA MENGGUNAKAN -->
+                    <div class="bg-gradient-to-br from-brand-50 to-white rounded-xl shadow-md border border-brand-100 p-6">
+                        <h3 class="font-bold text-gray-800 mb-4 flex items-center text-lg border-b border-brand-200 pb-2">
+                            <i class="fa-solid fa-compass mr-2 text-brand-500"></i> Cara Menggunakan
+                        </h3>
+                        <ul class="list-disc list-inside text-sm text-gray-600 space-y-2 font-medium">
+                            <li>Pastikan sudah <strong>login akun Gmail</strong> di HP atau Laptop.</li>
+                            <li>Pastikan sinyal internet stabil.</li>
+                            <li>Klik salah satu link di bawah (disarankan pakai <strong>versi 5 atau 6.1</strong>).</li>
+                            <li>Jika belum terbuka, copy link dan paste di browser Chrome.</li>
+                            <li class="mt-2 text-gray-800"><strong>Setelah aplikasi terbuka:</strong></li>
+                            <ul class="list-[circle] list-inside pl-4 space-y-1">
+                                <li>Upload foto produkmu.</li>
+                                <li>Pilih fitur sesuai kebutuhan.</li>
+                                <li>Klik <strong>Showcase</strong>, hitungan detik hasil muncul.</li>
+                            </ul>
+                            <li class="mt-2">Untuk menyimpan gambar, klik ikon <strong>Download</strong>.</li>
+                            <li>Jika tidak bisa, tekan lama pada gambar lalu pilih <em>Download/Save</em>.</li>
+                            <li>Jika hasil showcase loading lama, pastikan ukuran gambar <strong>Max 5MB</strong>.</li>
+                        </ul>
+                    </div>
+
+                    <!-- LINK TOOLS VERSION SECTION -->
+                    <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
+                        <div class="bg-gray-800 px-6 py-4">
+                            <h3 class="font-bold text-white flex items-center">
+                                <i class="fa-solid fa-gem mr-2 text-yellow-400"></i> Versi Tools Photo Kilat
+                            </h3>
+                            <p class="text-xs text-gray-300 mt-1">Noted: saat ini pakai link yang versi 5 / 6.1 saja ya</p>
+                        </div>
+                        
+                        <div class="p-5 space-y-5">
+                            
+                            <!-- Versi 1 -->
+                            <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                                <h4 class="font-bold text-gray-800 text-sm mb-1">Versi 1 <span class="font-normal text-gray-500">(Generate 6 gambar)</span></h4>
+                                <p class="text-xs text-blue-500 mb-3 break-link select-all">https://g.co/gemini/share/de7dbe5d3248</p>
+                                <a href="https://g.co/gemini/share/de7dbe5d3248" target="_blank" class="inline-flex items-center justify-center bg-brand-600 hover:bg-brand-700 text-white font-medium text-xs py-2 px-4 rounded transition w-full shadow-sm">
+                                    Klik Disini <i class="fa-solid fa-arrow-up-right-from-bracket ml-1.5"></i>
+                                </a>
+                            </div>
+
+                            <!-- Versi 2 -->
+                            <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                                <h4 class="font-bold text-gray-800 text-sm mb-1">Versi 2 <span class="font-normal text-gray-500">(Generate 6–32 gambar)</span></h4>
+                                <p class="text-xs text-blue-500 mb-3 break-link select-all">https://g.co/gemini/share/b8e5d2bad2a7</p>
+                                <a href="https://g.co/gemini/share/b8e5d2bad2a7" target="_blank" class="inline-flex items-center justify-center bg-brand-600 hover:bg-brand-700 text-white font-medium text-xs py-2 px-4 rounded transition w-full shadow-sm">
+                                    Klik Disini <i class="fa-solid fa-arrow-up-right-from-bracket ml-1.5"></i>
+                                </a>
+                            </div>
+
+                            <!-- Versi 3 -->
+                            <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                                <h4 class="font-bold text-gray-800 text-sm mb-1">Versi 3 <span class="font-normal text-gray-500">(Fitur Faceless & Logo)</span></h4>
+                                <p class="text-xs text-blue-500 mb-3 break-link select-all">https://g.co/gemini/share/b1089271da2e</p>
+                                <a href="https://g.co/gemini/share/b1089271da2e" target="_blank" class="inline-flex items-center justify-center bg-brand-600 hover:bg-brand-700 text-white font-medium text-xs py-2 px-4 rounded transition w-full shadow-sm">
+                                    Klik Disini <i class="fa-solid fa-arrow-up-right-from-bracket ml-1.5"></i>
+                                </a>
+                            </div>
+
+                            <!-- Versi 4 -->
+                            <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                                <h4 class="font-bold text-gray-800 text-sm mb-1">Versi 4.0 <span class="font-normal text-gray-500">(1-10 produk = 1 foto)</span></h4>
+                                <p class="text-xs text-blue-500 mb-3 break-link select-all">https://gemini.google.com/share/5b853b9d8e60</p>
+                                <a href="https://gemini.google.com/share/5b853b9d8e60" target="_blank" class="inline-flex items-center justify-center bg-brand-600 hover:bg-brand-700 text-white font-medium text-xs py-2 px-4 rounded transition w-full shadow-sm">
+                                    Klik Disini <i class="fa-solid fa-arrow-up-right-from-bracket ml-1.5"></i>
+                                </a>
+                            </div>
+
+                            <!-- Versi 5 -->
+                            <div class="bg-blue-50 border-blue-200 rounded-lg p-4 border shadow-sm">
+                                <h4 class="font-bold text-gray-800 text-sm mb-1">Versi 5 <span class="font-bold text-blue-600">(Rekomendasi - Fitur Rasio)</span></h4>
+                                <p class="text-xs text-blue-600 mb-3 break-link select-all">https://gemini.google.com/share/abdd34c8ff92</p>
+                                <a href="https://gemini.google.com/share/abdd34c8ff92" target="_blank" class="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs py-2 px-4 rounded transition w-full shadow-sm">
+                                    Klik Disini <i class="fa-solid fa-arrow-up-right-from-bracket ml-1.5"></i>
+                                </a>
+                            </div>
+
+                            <!-- Versi 6 -->
+                            <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                                <h4 class="font-bold text-gray-800 text-sm mb-1">Versi 6 <span class="font-normal text-gray-500">(Perbaikan & tanpa produk)</span></h4>
+                                <p class="text-xs text-blue-500 mb-3 break-link select-all">https://gemini.google.com/share/32ff9ec35c21</p>
+                                <a href="https://gemini.google.com/share/32ff9ec35c21" target="_blank" class="inline-flex items-center justify-center bg-brand-600 hover:bg-brand-700 text-white font-medium text-xs py-2 px-4 rounded transition w-full shadow-sm">
+                                    Klik Disini <i class="fa-solid fa-arrow-up-right-from-bracket ml-1.5"></i>
+                                </a>
+                            </div>
+
+                            <!-- Versi 6.1 -->
+                            <div class="bg-blue-50 border-blue-200 rounded-lg p-4 border shadow-sm">
+                                <h4 class="font-bold text-gray-800 text-sm mb-1">Versi 6.1 <span class="font-bold text-blue-600">(Rekomendasi)</span></h4>
+                                <p class="text-xs text-blue-600 mb-3 break-link select-all">https://gemini.google.com/share/0aef9a635fb7</p>
+                                <a href="https://gemini.google.com/share/0aef9a635fb7" target="_blank" class="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs py-2 px-4 rounded transition w-full shadow-sm">
+                                    Klik Disini <i class="fa-solid fa-arrow-up-right-from-bracket ml-1.5"></i>
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- BACKUP LINK V7 -->
+                    <div class="bg-orange-50 rounded-xl shadow-sm border border-orange-200 overflow-hidden">
+                        <div class="bg-orange-500 px-5 py-3">
+                            <h3 class="font-bold text-white text-sm"><i class="fa-solid fa-life-ring mr-2"></i> BACKUP TOOLS (Jika Link di Atas Error)</h3>
+                        </div>
+                        <div class="p-5 space-y-4">
+                            
+                            <div class="bg-white rounded border border-orange-100 p-3">
+                                <h4 class="font-bold text-gray-800 text-sm mb-2">1. Link V7 (Bisa upload foto + prompt)</h4>
+                                <ul class="text-xs text-gray-600 space-y-1 list-disc pl-4 mb-3">
+                                    <li>Bisa centang foto studio tanpa model -> hasilkan</li>
+                                    <li>Gunakan prompt sendiri -> centang & isi prompt</li>
+                                    <li>Jika muncul <em>allow Drive access</em>, klik allow</li>
+                                    <li><strong>Disarankan hasilkan 6 saja</strong> agar tidak limit</li>
+                                    <li>Jika terkena limit, switch email lain</li>
+                                    <li>Jika tidak upload gambar, pakai link gemini biasa.</li>
+                                </ul>
+                                <p class="text-[10px] text-blue-500 mb-2 break-link">https://ai.studio/apps/drive/1hZSWc2KxfnQUw6e_igGUcdlQR-vg8pCX?fullscreenApplet=true</p>
+                                <a href="https://ai.studio/apps/drive/1hZSWc2KxfnQUw6e_igGUcdlQR-vg8pCX?fullscreenApplet=true" target="_blank" class="block text-center bg-orange-500 hover:bg-orange-600 text-white font-medium text-xs py-2 rounded transition">
+                                    Klik Disini (Backup V7)
+                                </a>
+                            </div>
+
+                            <div class="bg-white rounded border border-orange-100 p-3">
+                                <h4 class="font-bold text-gray-800 text-sm mb-1">2. Link V7 prompt-only</h4>
+                                <p class="text-xs text-gray-500 mb-2">Tidak bisa upload foto produk (jika diupload hasil tidak sesuai).</p>
+                                <p class="text-[10px] text-blue-500 mb-2 break-link">https://gemini.google.com/share/709cfbefcebf</p>
+                                <a href="https://gemini.google.com/share/709cfbefcebf" target="_blank" class="block text-center bg-orange-500 hover:bg-orange-600 text-white font-medium text-xs py-2 rounded transition">
+                                    Klik Disini (Prompt Only)
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- TOOLS NOTA KILAT -->
+                    <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
+                        <div class="p-5 flex flex-col items-center text-center">
+                            <div class="bg-green-100 p-3 rounded-full text-green-600 mb-3"><i class="fa-solid fa-receipt text-2xl"></i></div>
+                            <h4 class="font-bold text-gray-800">Tools Gratis Nota Kilat</h4>
+                            <p class="text-xs text-blue-500 my-2 break-link">http://lynk.id/produktifwithai/4d1xq19olj09</p>
+                            <a href="http://lynk.id/produktifwithai/4d1xq19olj09" target="_blank" class="inline-flex items-center justify-center bg-gray-800 hover:bg-gray-900 text-white font-medium text-sm py-2 px-6 rounded-lg transition mt-1 w-full">
+                                Buka Tools Nota <i class="fa-solid fa-arrow-up-right-from-bracket ml-2"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- PROFILE & SUPPORT SECTION -->
+                    <div class="bg-white rounded-xl shadow-md border border-gray-100 p-6 text-center">
+                        <img src="https://ui-avatars.com/api/?name=Agus+Triian&background=2563eb&color=fff&size=128" alt="Agustriian" class="w-20 h-20 rounded-full mx-auto mb-3 shadow-md border-2 border-brand-500 object-cover">
+                        
+                        <h4 class="font-bold text-gray-800">Agustriian</h4>
+                        <p class="text-xs text-gray-500 mb-4">Founder Photo Kilat</p>
+                        
+                        <div class="flex flex-col space-y-2">
+                            <p class="text-xs text-gray-600 font-medium mb-1">JIKA ADA KENDALA & JOIN AFFILIATE BISA MENGHUBUNGI:</p>
+                            <a href="https://wa.me/6285755643820" target="_blank" class="flex items-center justify-center bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-lg transition text-sm">
+                                <i class="fa-brands fa-whatsapp text-lg mr-2"></i> Hubungi WhatsApp
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Pesan Penutup -->
+            <div class="mt-8 text-center bg-green-50 text-green-800 p-6 rounded-xl border border-green-200 shadow-sm">
+                <i class="fa-solid fa-leaf text-2xl text-green-500 mb-3 block"></i>
+                <p class="font-medium">Semoga bermanfaat, menghasilkan foto-foto yang profesional, dan membawa keberkahan dalam setiap usaha!</p>
+                <p class="font-bold mt-2">Wassalamu’alaikum warahmatullahi wabarakatuh</p>
+            </div>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-white border-t border-gray-200 mt-auto">
+            <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-sm text-gray-500">
+                <p>Simpan baik-baik link halaman ini ya, HANYA untuk MEMBER PHOTO KILAT ☺️</p>
+                <p class="mt-2">&copy; 2026 Kelas LMS Photo Kilat by Agustriian. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- LOGIKA LOGIN & UTILITY SECURITY SCRIPT -->
+    <script>
+        const loginForm = document.getElementById('login-form');
+        const loginScreen = document.getElementById('login-screen');
+        const dashboardScreen = document.getElementById('dashboard-screen');
+        const errorMsg = document.getElementById('error-msg');
+        
+        // Logika Show/Hide Password
+        const togglePasswordBtn = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+        const eyeIcon = document.getElementById('eyeIcon');
+
+        togglePasswordBtn.addEventListener('click', function () {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            eyeIcon.classList.toggle('fa-eye');
+            eyeIcon.classList.toggle('fa-eye-slash');
+        });
+        
+        // Kredensial Akses Photo Kilat
+        const validUsername = "phokil";
+        const validPassword = "passwordbeli";
+
+        if (sessionStorage.getItem('isLoggedIn') === 'true') showDashboard();
+
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (document.getElementById('username').value === validUsername && document.getElementById('password').value === validPassword) {
+                sessionStorage.setItem('isLoggedIn', 'true');
+                errorMsg.classList.add('hidden');
+                showDashboard();
+            } else {
+                errorMsg.classList.remove('hidden');
+                loginForm.classList.add('shake');
+                setTimeout(() => loginForm.classList.remove('shake'), 400);
+            }
+        });
+
+        function showDashboard() {
+            loginScreen.classList.add('hidden');
+            dashboardScreen.classList.remove('hidden');
+            window.scrollTo(0, 0);
+        }
+
+        function logout() {
+            sessionStorage.removeItem('isLoggedIn');
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            
+            passwordInput.setAttribute('type', 'password');
+            eyeIcon.classList.add('fa-eye');
+            eyeIcon.classList.remove('fa-eye-slash');
+
+            dashboardScreen.classList.add('hidden');
+            loginScreen.classList.remove('hidden');
+        }
+
+        // ==========================================
+        // SCRIPT KEAMANAN (ANTI-INSPECT & PROTEKSI)
+        // ==========================================
+        document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+
+        document.onkeydown = function(e) {
+            if (e.keyCode == 123) return false; // F12
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 73) return false; // Ctrl+Shift+I
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 74) return false; // Ctrl+Shift+J
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 67) return false; // Ctrl+Shift+C
+            if (e.ctrlKey && e.keyCode == 85) return false; // Ctrl+U
+            if (e.ctrlKey && e.keyCode == 83) return false; // Ctrl+S (Save)
+        };
+
+        document.addEventListener('dragstart', function(e) { e.preventDefault(); });
+    </script>
+</body>
+</html>
